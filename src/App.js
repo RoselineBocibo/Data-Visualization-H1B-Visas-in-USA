@@ -1,16 +1,26 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import _ from 'lodash';
+
 import './App.css';
+
 import Preloader from './components/Preloader';
 import { loadAllData } from './DataHandling';
+
 import CountyMap from './components/CountyMap';
+import Histogram from './components/Histogram';
+import { Title, Description, GraphDescription } from './components/Meta';
 
 class App extends Component {
     state = {
         techSalaries: [],
         countyNames: [],
-        medianIncomes: []
+        medianIncomes: [],
+        filteredBy: {
+            USstate: '*',
+            year: '*',
+            jobTitle: '*'
+        }
     }
 
     componentWillMount() {
@@ -50,6 +60,15 @@ class App extends Component {
 
         return (
             <div className="App container">
+                <Title data={filteredSalaries} filteredBy={this.state.filteredBy} />
+                <Description data={filteredSalaries}
+                             allData={this.state.techSalaries}
+                             medianIncomesByCounty={this.state.medianIncomesByCounty}
+                             filteredBy={this.state.filteredBy} />
+
+                <GraphDescription data={filteredSalaries}
+                                  filteredBy={this.state.filteredBy} />
+
                 <svg width="1100" height="500">
                     <CountyMap usTopoJson={this.state.usTopoJson}
                                USstateNames={this.state.USstateNames}
@@ -59,10 +78,20 @@ class App extends Component {
                                width={500}
                                height={500}
                                zoom={zoom} />
-                  
+
+                    <Histogram bins={10}
+                               width={500}
+                               height={500}
+                               x="500"
+                               y="10"
+                               data={filteredSalaries}
+                               axisMargin={83}
+                               bottomMargin={5}
+                               value={d => d.base_salary} />
                 </svg>
             </div>
         );
     }
 }
+
 export default App;
